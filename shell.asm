@@ -75,7 +75,7 @@ cic:	mov dl,0 ;unidad actual
 		mov ah, 13h
 		mov al, 1
 		mov bh, 00h
-		mov bl, 1
+		mov bl, 00000111b
 		mov cx, lendir
 		mov dh, renglon
 		mov dl, 0
@@ -85,7 +85,28 @@ cic:	mov dl,0 ;unidad actual
 		;esperar usuario
 		mov ah,00h
 		int 16h
-		inc renglon
+
+		;Por ahora se incrementa el renglón cuando se presiona cualquiere tecla
+		;se cambiará a cuando sea enter lo que se presione
+		add renglon, 02h		;25 renglones como máximo, después de eso se tiene que comenzar a 
+								;desplazar la ventana hacia arriba para que se pueda seguir escribiendo
+		cmp renglon, 25
+		jge despan
+		jmp cic
+
+despan:	
+		pusha
+		mov ah, 06h
+		mov al, 2
+		mov ch, 1
+		mov cl, 1
+		;mov dl, 80
+		mov dh, 0
+		int 10h
+		popa
+
+		sub renglon, 02h
+
 		jmp cic
 		
 		
