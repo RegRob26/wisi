@@ -1,5 +1,7 @@
 .MODEL SMALL
 .386
+extrn des2:near
+extrn spc:near
 .STACK
 .DATA
 
@@ -88,13 +90,15 @@ cic:	mov dl,0 ;unidad actual
 		mov bp, offset ndir
 		int 10h
 
-
 		; mov ah,00h
 		; int 16h
 
 		;esperar usuario
-		
+
+		mov cl, 18
+		mov dx, offset cadena		
 		call leecad
+		call desar
 		
 		;Por ahora se incrementa el renglón cuando se presiona cualquiere tecla
 		;se cambiará a cuando sea enter lo que se presione
@@ -128,6 +132,16 @@ leecad: mov bx, dx
         int 21h
         mov al, [bx-1]
         ret	
+
+ desar: cld
+        mov si, offset cadena
+        mov cx, 18
+ cic1:  lodsb
+        mov dx, ax
+        call des2
+        call spc
+        loop cic1
+        ret
 
 salida: 	
 		pop ax
