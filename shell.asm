@@ -19,6 +19,12 @@ lendir dw ?
 renglon db ?
 
 
+pre_cad db 2 dup(?)
+cadena db 18
+
+comando db 50 dup(?)
+
+
 .CODE
 lenar macro cad, len
 local cic1
@@ -82,10 +88,14 @@ cic:	mov dl,0 ;unidad actual
 		mov bp, offset ndir
 		int 10h
 
-		;esperar usuario
-		mov ah,00h
-		int 16h
 
+		; mov ah,00h
+		; int 16h
+
+		;esperar usuario
+		
+		call leecad
+		
 		;Por ahora se incrementa el renglón cuando se presiona cualquiere tecla
 		;se cambiará a cuando sea enter lo que se presione
 		add renglon, 02h		;25 renglones como máximo, después de eso se tiene que comenzar a 
@@ -95,22 +105,31 @@ cic:	mov dl,0 ;unidad actual
 		jmp cic
 
 despan:	
-		pusha
+		;Esta función desplaza la pantalla hacia arroba cuando se alcanza el tamaño
+		;máximo de renglones, guardando la misma configuración que cuando los renglones
+		;son permitidos
 		mov ah, 06h
 		mov al, 2
 		mov ch, 1
-		mov cl, 1
-		;mov dl, 80
+		mov cl, 0		;mov dl, 80
 		mov dh, 0
 		int 10h
-		popa
-
+		;Decrementamos el renglón para mantener la última línea del directorio
+		;en el último renglón permitido
 		sub renglon, 02h
 
-		jmp cic
-		
-		
-salida: 		
+		jmp cic	
+
+
+leecad: mov bx, dx
+        sub dx, 02
+        mov [bx-2], cl
+        mov ah, 0Ah
+        int 21h
+        mov al, [bx-1]
+        ret	
+
+salida: 	
 		pop ax
 		mov ah,0
 		int 10h
