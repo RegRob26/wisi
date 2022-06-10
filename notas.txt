@@ -1,0 +1,9 @@
+Según el criterio, se debería crear un ciclo para que se ejecute hasta que se cierre por completo
+o con el comando exit
+Hasta ahora si se presiona cualquier tecla creará una nueva línea debajo de la anterior, igual que 
+en una shell, pero en lugar de leer solo un teclazo se tiene que leer en bufer para después 
+comparar que comando y sus instrucciones estamos leyendo, para después de esto crear la instancia 
+dicha anteriormente.
+
+La solución a eso podría ser un estilo de case para que vaya comparando lo que se leyó con los
+comandos registrados

@@ -38,3 +38,20 @@
         mov bl, 00001111b
         mov cx, 1
         int 10h
+
+
+
+			
+		mov cx,10
+		mov si,0
+ leer:
+		mov ah,07h
+		int 21h
+		;lee 10 caracteres y los gurda el cadena
+		mov dl,al
+		mov ah,02h
+		int 21h
+		
+		mov cadena[si],al
+		inc si
+		loop leer

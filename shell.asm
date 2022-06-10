@@ -1,6 +1,9 @@
 .MODEL SMALL
 .386
 extrn des2:near
+extrn des4:near
+extrn desdec:near
+extrn des1:near
 extrn spc:near
 .STACK
 .DATA
@@ -22,10 +25,13 @@ renglon db ?
 
 
 pre_cad db 2 dup(?)
-cadena db 18
+cadena db 18 dup('_')
 
-comando db 50 dup(?)
+comando db 10 dup('-')
+lencomando dw ?
 
+
+cexit db "exit-"
 
 .CODE
 lenar macro cad, len
@@ -36,9 +42,41 @@ local cic1
         inc bx
         cmp dl, '"'
         jne cic1
+
         dec bx
 		mov len, bx
 		mov lendir, bx
+
+        popa
+
+endm
+
+
+sepcom macro cad, com, len
+local cic1, sep_sal, copy
+        pusha
+        mov bx, 0h
+ cic1:  mov dl, cad[bx]
+        inc bx
+        cmp dl, ' '
+		je sep_sal
+		cmp dl, 0DH
+		je sep_sal
+		jmp cic1
+ sep_sal:
+		mov lencomando, bx
+		mov cx, bx
+		dec cx
+		mov bx, 0h
+ copy:	mov dl, cad[bx]
+
+		mov com[bx], dl
+
+		inc bx
+
+		
+		loop copy
+		
 
         popa
 
@@ -77,8 +115,7 @@ cic:	mov dl,0 ;unidad actual
 		;Calcular el tamaño de la cadena en que se almacenó el dato de la ruta
 		mov cx, 0
         lenar ndir cx
-        mov dx, cx
-
+		
 		;Desplegar ruta en la pantalla creada para emular lo que se muestra en dosbox al inicio
 		mov ah, 13h
 		mov al, 1
@@ -90,16 +127,31 @@ cic:	mov dl,0 ;unidad actual
 		mov bp, offset ndir
 		int 10h
 
-		; mov ah,00h
-		; int 16h
-
-		;esperar usuario
 
 		mov cl, 18
 		mov dx, offset cadena		
 		call leecad
-		call desar
 		
+
+		mov cx, 0
+        sepcom cadena comando cx 
+		call desar
+		mov dx, lencomando
+		;call des4
+
+		cld
+		mov si,offset comando
+		mov di,offset cexit
+		mov cx,lencomando
+		repe cmpsb ;Se detendrá en dos posibles casos:
+		; -encontró una diferencia
+		; -CX llegó a 0.
+		jne continua
+		jmp salida
+
+
+
+continua:call clean_arr
 		;Por ahora se incrementa el renglón cuando se presiona cualquiere tecla
 		;se cambiará a cuando sea enter lo que se presione
 		add renglon, 02h		;25 renglones como máximo, después de eso se tiene que comenzar a 
@@ -115,13 +167,14 @@ despan:
 		mov ah, 06h
 		mov al, 2
 		mov ch, 1
-		mov cl, 0		;mov dl, 80
-		mov dh, 0
-		int 10h
-		;Decrementamos el renglón para mantener la última línea del directorio
+		mov cl, 1
+		;mov dl, 80
+		mov dh, 1
+		int 10
+
 		;en el último renglón permitido
 		sub renglon, 02h
-
+		
 		jmp cic	
 
 
@@ -134,7 +187,7 @@ leecad: mov bx, dx
         ret	
 
  desar: cld
-        mov si, offset cadena
+        mov si, offset comando
         mov cx, 18
  cic1:  lodsb
         mov dx, ax
@@ -143,6 +196,17 @@ leecad: mov bx, dx
         loop cic1
         ret
 
+
+ clean_arr:
+		cld
+		mov di, offset comando
+		mov cx, 10
+		mov ax, '-'
+
+ cic_cle:
+		stosb
+		loop cic_cle
+		ret
 salida: 	
 		pop ax
 		mov ah,0
