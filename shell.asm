@@ -1,5 +1,6 @@
 .MODEL SMALL
 .386
+include ..\fun\macros.asm
 extrn des2:near
 extrn des4:near
 extrn desdec:near
@@ -25,15 +26,29 @@ renglon db ?
 
 
 pre_cad db 2 dup(?)
-cadena db 18 dup('_')
+cadena db 18 dup('-')
 
 comando db 10 dup('-')
 lencomando dw ?
 
 
-cexit db "exit-"
+cexit 	db "exit-"
+ccd		db "cd-"
+ctouch	db "touch-"
+cdir	db "dir-"
+cmkdir 	db "mkdir-"	
+crm		db "rm-"
+ccls	db "cls-"
+center  db "0D-"
 
 .CODE
+
+;lenar es una macro que nos permite obtener la longitud de una cadena leída mediante la comparación 
+;con un caracter del tipo ", este caracter es utilizado puesto que en la declaración de la cadena
+;se hace uso de este caracter para la inicialización.
+
+;Posiblemente en una futura versión se permita ingresar también el caracter que se busca para facilitar
+;la reutilización de la macro
 lenar macro cad, len
 local cic1
         pusha
@@ -52,6 +67,12 @@ local cic1
 endm
 
 
+
+;sepcom es una macro que recibe dos cadenas y un registro de longitud de nombre len (este último se podría)
+; (omitir puesto que realmente no tiene tanta importancia ya que el resultado se guarda en una variable)
+;para separar el comando de los argumentos. cad es la cadena leída que incluye juntos el comando y sus 
+;argumentos, se busca el factor de separación que es 0D o 20, es decir '\n' o ' '. para luego copiar
+;el comando en una variable previamente definida y posteriormente copiará los argumentos
 sepcom macro cad, com, len
 local cic1, sep_sal, copy
         pusha
@@ -63,21 +84,30 @@ local cic1, sep_sal, copy
 		cmp dl, 0DH
 		je sep_sal
 		jmp cic1
- sep_sal:
-		mov lencomando, bx
-		mov cx, bx
+ sep_sal:	
+ 		mov cx, bx
+		
 		dec cx
+
+		mov dx, cx
+		call desdec
+		call spc
+		
+		mov lencomando, bx
 		mov bx, 0h
+
+		cmp cx, 0
+		jg copy
+		inc cx
+
+		mov dx, cx
+		call desdec
+		call spc
  copy:	mov dl, cad[bx]
-
 		mov com[bx], dl
-
 		inc bx
-
-		
 		loop copy
-		
-
+	
         popa
 
 endm
@@ -128,6 +158,8 @@ cic:	mov dl,0 ;unidad actual
 		int 10h
 
 
+		;Preparamos la lectura de la terminal y la guardamos dentro del arreglo con  nombre cadena
+		;Tiene 
 		mov cl, 18
 		mov dx, offset cadena		
 		call leecad
@@ -136,24 +168,15 @@ cic:	mov dl,0 ;unidad actual
 		mov cx, 0
         sepcom cadena comando cx 
 		call desar
-		mov dx, lencomando
+		
+		
+		;mov dx, lencomando
 		;call des4
 
-		cld
-		mov si,offset comando
-		mov di,offset cexit
-		mov cx,lencomando
-		repe cmpsb ;Se detendrá en dos posibles casos:
-		; -encontró una diferencia
-		; -CX llegó a 0.
-		jne continua
-		jmp salida
-
+		call verificador
 
 
 continua:call clean_arr
-		;Por ahora se incrementa el renglón cuando se presiona cualquiere tecla
-		;se cambiará a cuando sea enter lo que se presione
 		add renglon, 02h		;25 renglones como máximo, después de eso se tiene que comenzar a 
 								;desplazar la ventana hacia arriba para que se pueda seguir escribiendo
 		cmp renglon, 25
@@ -178,6 +201,97 @@ despan:
 		jmp cic	
 
 
+;verificador se va a encargar de la interpretación del comando y la correcta elección del comando ingresado
+;puesto que los comando están previamente definidos se opta por directamente referenciarlos en la función
+;para reducir los parámetros. Además de la nula variación del lugar donde se encuentra comando se opta por seguir
+;la misma relación que para los demás parámetros
+;!Posiblemente comando sea pasado mediante la pila a esta función
+;!Agregar un parámetro a la función para que retorne un código según el comando interpretado
+verificador: 
+		cld
+		mov si,offset comando
+		mov di,offset cexit
+		mov cx,lencomando
+		repe cmpsb 						;Se detendrá en dos posibles casos:
+										; -encontró una diferencia
+										; -CX llegó a 0.
+		jne com_enter
+		print "es exit"
+		jmp salida
+ com_enter:
+ 		cld 
+		mov si, offset comando
+		mov di, offset center
+		mov cx, lencomando
+		repe cmpsb
+		jne com_cd
+		print "Es enter"
+		jmp ret_ver
+
+ com_cd:
+		cld 
+		mov si, offset comando
+		mov di, offset ccd
+		mov cx, lencomando
+		repe cmpsb
+		jne com_dir
+		print "Es cd"
+		jmp ret_ver
+ com_dir:
+		cld 
+		mov si, offset comando
+		mov di, offset cdir
+		mov cx, lencomando
+		repe cmpsb
+		jne com_touch
+		print "Es dir"
+		jmp ret_ver
+ com_touch:
+		cld 
+		mov si, offset comando
+		mov di, offset ctouch
+		mov cx, lencomando
+		repe cmpsb
+		jne com_mkdir
+		print "Es touch"
+		jmp ret_ver
+ com_mkdir:
+		cld 
+		mov si, offset comando
+		mov di, offset cmkdir
+		mov cx, lencomando
+		repe cmpsb
+		jne com_rm
+		print "Es mkdir"
+		jmp ret_ver
+ com_rm:
+		cld 
+		mov si, offset comando
+		mov di, offset crm
+		mov cx, lencomando
+		repe cmpsb
+		jne com_cls
+		print "Es rm"
+		jmp ret_ver
+
+ com_cls:
+		cld 
+		mov si, offset comando
+		mov di, offset ccls
+		mov cx, lencomando
+		repe cmpsb
+		jne ret_ver
+		jmp ret_ver
+
+ ret_ver:
+		 
+ 		ret
+
+
+
+;leecad es la función utilizada para leer la cadena dada por el usuario. Tiene un tamaño máximo restringido
+;de 18 caracteres puesto que no se permiten cadenas demasiado largas por simplicidad del funcionamiento
+;del programa. Hace uso de la función 0Ah de la interrupción 21
 leecad: mov bx, dx
         sub dx, 02
         mov [bx-2], cl
@@ -185,6 +299,8 @@ leecad: mov bx, dx
         int 21h
         mov al, [bx-1]
         ret	
+
+;Desar permite desplegar una cadena dada su dirección y tamaño. Nos la muestra en valores hexadecimales
 
  desar: cld
         mov si, offset comando
@@ -197,6 +313,11 @@ leecad: mov bx, dx
         ret
 
 
+
+
+;El principal funcionamiento de clean_array es limpiar el arreglo que lee los comandos y sus 
+;argumentos para posteriormente dejarlo como si recien hubiera sido creado, de esta manera
+;evitamos que hay sobreposición de datos
  clean_arr:
 		cld
 		mov di, offset comando
@@ -206,7 +327,17 @@ leecad: mov bx, dx
  cic_cle:
 		stosb
 		loop cic_cle
+
+		cld 
+		mov di, offset cadena
+		mov cx, 18
+		mov ax, '_'
+
+ cic_cals:
+		stosb
+		loop cic_cals
 		ret
+
 salida: 	
 		pop ax
 		mov ah,0
