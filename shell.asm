@@ -9,27 +9,27 @@ extrn spc:near
 .STACK
 .DATA
 
-DTA db 21 dup(0)
-attr db 0
-time dw 0
-date dw 0
-sizel dw 0
-sizeh dw 0
-fname db 13 dup(0)
+DTA 	db 21 dup(0)
+attr 	db 0
+time 	dw 0
+date 	dw 0
+sizel 	dw 0
+sizeh 	dw 0
+fname 	db 13 dup(0)
 
 
-BIEN db "root> $"
-ndir db 164 dup('"')
-lendir dw ?
+BIEN 		db "root> $"
+ndir 		db 164 dup('"')
+lendir 		dw ?
 
-renglon db ?
+renglon 	db ?
 
 
-pre_cad db 2 dup(?)
-cadena db 18 dup('-')
+pre_cad 	db 2 dup(?)
+cadena 		db 18 dup('-')
 
-comando db 10 dup('-')
-lencomando dw ?
+comando 	db 10 dup('-')
+lencomando 	dw ?
 
 
 cexit 	db "exit-"
@@ -49,11 +49,12 @@ center  db "0D-"
 
 ;Posiblemente en una futura versión se permita ingresar también el caracter que se busca para facilitar
 ;la reutilización de la macro
-lenar macro cad, len
+lenar 	macro cad, len
 local cic1
         pusha
         mov bx, 0h
- cic1:  mov dl, cad[bx]
+ cic1:  
+ 		mov dl, cad[bx]
         inc bx
         cmp dl, '"'
         jne cic1
@@ -73,11 +74,12 @@ endm
 ;para separar el comando de los argumentos. cad es la cadena leída que incluye juntos el comando y sus 
 ;argumentos, se busca el factor de separación que es 0D o 20, es decir '\n' o ' '. para luego copiar
 ;el comando en una variable previamente definida y posteriormente copiará los argumentos
-sepcom macro cad, com, len
-local cic1, sep_sal, copy
+sepcom 	macro cad, com, len
+local 	cic1, sep_sal, copy
         pusha
         mov bx, 0h
- cic1:  mov dl, cad[bx]
+ cic1:  
+ 		mov dl, cad[bx]
         inc bx
         cmp dl, ' '
 		je sep_sal
@@ -103,7 +105,8 @@ local cic1, sep_sal, copy
 		mov dx, cx
 		call desdec
 		call spc
- copy:	mov dl, cad[bx]
+ copy:	
+ 		mov dl, cad[bx]
 		mov com[bx], dl
 		inc bx
 		loop copy
@@ -112,7 +115,8 @@ local cic1, sep_sal, copy
 
 endm
 
-main:   mov ax, @data
+main:   
+		mov ax, @data
         mov es, ax
         mov ds, ax
 
@@ -136,7 +140,8 @@ main:   mov ax, @data
 		; al área del usuario de 64 bytes, la que contiene el
 		; directorio; AX contiene el código de error
 
-cic:	mov dl,0 ;unidad actual
+cic:	
+		mov dl,0 ;unidad actual
     	mov si,offset ndir ;ds:si buffer
     	mov ah,47h ;Código para obtener ruta
     	int 21h ;Obtener ruta
@@ -157,36 +162,32 @@ cic:	mov dl,0 ;unidad actual
 		mov bp, offset ndir
 		int 10h
 
-
 		;Preparamos la lectura de la terminal y la guardamos dentro del arreglo con  nombre cadena
 		;Tiene 
 		mov cl, 18
 		mov dx, offset cadena		
 		call leecad
 		
-
 		mov cx, 0
         sepcom cadena comando cx 
 		call desar
-		
-		
-		;mov dx, lencomando
-		;call des4
 
 		call verificador
 
 
-continua:call clean_arr
+continua:
+		call clean_arr
 		add renglon, 02h		;25 renglones como máximo, después de eso se tiene que comenzar a 
 								;desplazar la ventana hacia arriba para que se pueda seguir escribiendo
 		cmp renglon, 25
 		jge despan
 		jmp cic
 
+
+;Esta función desplaza la pantalla hacia arroba cuando se alcanza el tamaño
+;máximo de renglones, guardando la misma configuración que cuando los renglones
+;son permitidos
 despan:	
-		;Esta función desplaza la pantalla hacia arroba cuando se alcanza el tamaño
-		;máximo de renglones, guardando la misma configuración que cuando los renglones
-		;son permitidos
 		mov ah, 06h
 		mov al, 2
 		mov ch, 1
@@ -194,12 +195,9 @@ despan:
 		;mov dl, 80
 		mov dh, 1
 		int 10
-
 		;en el último renglón permitido
 		sub renglon, 02h
-		
 		jmp cic	
-
 
 ;verificador se va a encargar de la interpretación del comando y la correcta elección del comando ingresado
 ;puesto que los comando están previamente definidos se opta por directamente referenciarlos en la función
@@ -213,10 +211,8 @@ verificador:
 		mov di,offset cexit
 		mov cx,lencomando
 		repe cmpsb 						;Se detendrá en dos posibles casos:
-										; -encontró una diferencia
-										; -CX llegó a 0.
-		jne com_enter
-		print "es exit"
+		jne com_enter					; -encontró una diferencia
+		print "es exit"					; -CX llegó a 0.			
 		jmp salida
  com_enter:
  		cld 
@@ -281,10 +277,15 @@ verificador:
 		mov cx, lencomando
 		repe cmpsb
 		jne ret_ver
+
+		mov ax, 3
+		int 10h
+		mov renglon, -2
+		int 10h
+		
 		jmp ret_ver
 
  ret_ver:
-		 
  		ret
 
 
@@ -292,7 +293,8 @@ verificador:
 ;leecad es la función utilizada para leer la cadena dada por el usuario. Tiene un tamaño máximo restringido
 ;de 18 caracteres puesto que no se permiten cadenas demasiado largas por simplicidad del funcionamiento
 ;del programa. Hace uso de la función 0Ah de la interrupción 21
-leecad: mov bx, dx
+leecad: 
+		mov bx, dx
         sub dx, 02
         mov [bx-2], cl
         mov ah, 0Ah
@@ -302,18 +304,17 @@ leecad: mov bx, dx
 
 ;Desar permite desplegar una cadena dada su dirección y tamaño. Nos la muestra en valores hexadecimales
 
- desar: cld
+ desar: 
+ 		cld
         mov si, offset comando
         mov cx, 18
- cic1:  lodsb
+ cic1:  
+ 		lodsb
         mov dx, ax
         call des2
         call spc
         loop cic1
         ret
-
-
-
 
 ;El principal funcionamiento de clean_array es limpiar el arreglo que lee los comandos y sus 
 ;argumentos para posteriormente dejarlo como si recien hubiera sido creado, de esta manera
