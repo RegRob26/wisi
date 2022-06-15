@@ -21,16 +21,18 @@ fname 	db 13 dup(0)
 
 
 BIEN 		db "root> $"
-ndir 		db 164 dup('"')
+ndir 		db 164 dup('-')
 lendir 		dw ?
 renglon 	db ?
+lencomando 	dw ?
+outhandle dw ?
+
 pre_cad 	db 2 dup(?)
 cadena 		db 19 dup('-')
 comando 	db 6 dup('-')
 instrucciones db 14 dup('-'), 0
-lencomando 	dw ?
 
-outhandle dw ?
+
 
 
 ;Declaración de los comandos existentes
@@ -41,10 +43,6 @@ cdir	db "dir-"
 cmkdir 	db "mkdir-"	
 crm		db "rm-"
 ccls	db "cls-"
-center  db "0D-"
-
-
-
 
 
 .CODE
@@ -62,7 +60,7 @@ local cic1
  cic1:  
  		mov dl, cad[bx]
         inc bx
-        cmp dl, '"'
+        cmp dl, '-'
         jne cic1
 
         dec bx
@@ -97,6 +95,7 @@ local 	cic1, sep_sal, copy
 		mov lencomando, bx
 		mov bx, 0h
 		cld
+
 		cmp cx, 0
 		jg copy
 		
@@ -106,28 +105,29 @@ local 	cic1, sep_sal, copy
 		mov si, offset cad
 		mov di, offset com
 		rep movsb
-		
-		mov dx, lencomando
 
-		; mov dx, lencomando
-		 call desdec
-		 call spc
-
-		 mov dx, lencomando
-		 inc cx
-		 mov cx, 18
-		 sub cx, dx
-		 ;sub cx, 2
-
-		 mov dx, cx
-		 call desdec
-		 call spc
-
+		mov cx, lencomando
+		mov dx, lendir
+		sub dx, cx	
+		mov cx, dx
+		;dec cx
 		 cld
 		 mov si, offset cad
 		 add si, lencomando
 		 mov di, offset instr
 		 rep movsb
+		 
+		 mov dx, lendir
+		 mov cx, lencomando
+		 sub dx, cx
+		 
+		 mov bx, dx
+		 mov dx, bx
+		 call desdec 
+		 call spc
+		 dec bx
+		 mov instr[bx], 0h
+
 
         popa
 endm
@@ -184,7 +184,11 @@ cic:
 		mov cl, 19
 		mov dx, offset cadena		
 		call leecad
-		
+
+		mov cx, 0
+		lenar cadena cx
+
+
 		mov cx, 0
         sepcom cadena comando instrucciones cx 
 		call desar
@@ -349,7 +353,7 @@ leecad:
 desar: 
  		cld
         mov si, offset instrucciones
-        mov cx, 12
+        mov cx, 14
  cic1:  
  		lodsb
         mov dx, ax
