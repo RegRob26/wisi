@@ -42,6 +42,7 @@ ctouch	db "touch-"
 cdir	db "dir-"
 cmkdir 	db "mkdir-"	
 crm		db "rm-"
+crmdir		db "rmdir-"
 ccls	db "cls-"
 
 
@@ -106,27 +107,20 @@ local 	cic1, sep_sal, copy
 		mov di, offset com
 		rep movsb
 
+		mov dx, lencomando
+		mov cx, lendir
+		sub cx, dx	
+		cld
+		mov si, offset cad
+		add si, lencomando
+		mov di, offset instr
+		rep movsb
+		
+		mov bx, lendir
 		mov cx, lencomando
-		mov dx, lendir
-		sub dx, cx	
-		mov cx, dx
-		;dec cx
-		 cld
-		 mov si, offset cad
-		 add si, lencomando
-		 mov di, offset instr
-		 rep movsb
-		 
-		 mov dx, lendir
-		 mov cx, lencomando
-		 sub dx, cx
-		 
-		 mov bx, dx
-		 mov dx, bx
-		 call desdec 
-		 call spc
-		 dec bx
-		 mov instr[bx], 0h
+		sub bx, cx
+		dec bx
+		mov instr[bx], 0h
 
 
         popa
@@ -191,7 +185,7 @@ cic:
 
 		mov cx, 0
         sepcom cadena comando instrucciones cx 
-		call desar
+		;call desar
 		;call desar
 
 		call verificador
@@ -242,6 +236,8 @@ despan:
 ;la misma relación que para los demás parámetros
 ;!Posiblemente comando sea pasado mediante la pila a esta función
 ;!Agregar un parámetro a la función para que retorne un código según el comando interpretado
+;! HECHAS: exit, dir, mkdir, touch, rm, rmdir
+;!TODO cd
 verificador:
 
 		cld
@@ -263,6 +259,11 @@ verificador:
 		repe cmpsb
 		jne com_dir
 		print "Es cd"
+
+		mov ah, 3BH
+		lea dx, instrucciones
+		int 21h
+
 		jmp ret_ver
  com_dir:
 		cld 
@@ -302,6 +303,11 @@ verificador:
 		repe cmpsb
 		jne com_rm
 		print "Es mkdir"
+
+		mov ah, 39h
+		lea dx, instrucciones
+		int 21h
+
 		jmp ret_ver
  com_rm:
 		cld 
@@ -309,9 +315,29 @@ verificador:
 		mov di, offset crm
 		mov cx, lencomando
 		repe cmpsb
-		jne com_cls
-		print "Es rm"
+		jne com_rmdir
+		print "Es rm "
+		
+		mov ah, 41h
+		lea dx,instrucciones
+		int 21h
+		
 		jmp ret_ver
+
+ com_rmdir:
+		cld 
+		mov si, offset comando
+		mov di, offset crmdir
+		mov cx, lencomando
+		repe cmpsb
+		jne com_cls
+		print "Es rmdir "
+		
+		mov ah, 3Ah
+		lea dx,instrucciones
+		int 21h
+		jmp ret_ver
+
 
  com_cls:
 		cld 
@@ -366,6 +392,7 @@ desar:
 ;argumentos para posteriormente dejarlo como si recien hubiera sido creado, de esta manera
 ;evitamos que hay sobreposición de datos
 clean_arr:
+
 		cld
 		mov di, offset comando
 		mov cx, 6
@@ -391,7 +418,18 @@ clean_arr:
  cic_ins:
  		stosb
 		loop cic_ins
+ cic_ndir:
+		cld
+		mov di, offset ndir
+		mov cx, 164
+		mov ax, '-'
+
+ cic_cdir:
+		stosb
+		loop cic_cdir	
 		ret
+
+
 
 
 salida: 	
