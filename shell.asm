@@ -3,11 +3,8 @@
 .MODEL SMALL
 .386
 include ..\fun\macros.asm
-extrn des2:near
-extrn des4:near
-extrn desdec:near
-extrn des1:near
-extrn spc:near
+extrn verificador:near
+extrn ejecutador:near
 .STACK
 .DATA
 
@@ -20,30 +17,18 @@ sizeh 	dw 0
 fname 	db 13 dup(0)
 
 
-BIEN 		db "root> $"
+BIEN 		db ">"
 ndir 		db 164 dup('-')
 lendir 		dw ?
 renglon 	db ?
 lencomando 	dw ?
-outhandle dw ?
+flagverifi	dw ?
+
 
 pre_cad 	db 2 dup(?)
 cadena 		db 19 dup('-')
 comando 	db 6 dup('-')
 instrucciones db 14 dup('-'), 0
-
-
-
-
-;Declaración de los comandos existentes
-cexit 	db "exit-"
-ccd		db "cd-"
-ctouch	db "touch-"
-cdir	db "dir-"
-cmkdir 	db "mkdir-"	
-crm		db "rm-"
-crmdir		db "rmdir-"
-ccls	db "cls-"
 
 
 .CODE
@@ -146,6 +131,8 @@ main:
 		mov al,03h
 		int 10h
 		mov renglon, 0
+
+		mov flagverifi, 0 		;0 será el neutro para nuestras ejecuciones
 		;Obtener la ruta del directorio en donde estamos
 		;47 Obtiene el directorio actual Disco DL = numero de la unidad del disco; DS:SI = puntador
 		; al área del usuario de 64 bytes, la que contiene el
@@ -167,9 +154,19 @@ cic:
 		mov al, 1
 		mov bh, 00h
 		mov bl, 00000111b
-		mov cx, lendir
+		mov cx, 1
 		mov dh, renglon
 		mov dl, 0
+		mov bp, offset BIEN
+		int 10h
+
+		mov ah, 13h
+		mov al, 1
+		mov bh, 00h
+		mov bl, 00000111b
+		mov cx, lendir
+		mov dh, renglon
+		mov dl, 2
 		mov bp, offset ndir
 		int 10h
 
@@ -185,12 +182,26 @@ cic:
 
 		mov cx, 0
         sepcom cadena comando instrucciones cx 
-		;call desar
-		;call desar
 
+
+		mov bx, offset flagverifi			;[bp+8]
+		push bx
+		mov dx, lencomando			;[bp + 6]
+		push dx					
+		mov dx, offset comando		;[bp+4]
+		push dx
 		call verificador
+		add sp, 8
 
-
+		mov dx, offset renglon			;[bp + 8]
+		push dx					
+		mov dx, offset instrucciones ;[bp+6]
+		push dx
+		mov dx, flagverifi		;[bp+4]
+		push dx
+		call ejecutador
+		add sp, 6
+		mov flagverifi, 0
 continua:
 		call clean_arr
 		add renglon, 02h		;25 renglones como máximo, después de eso se tiene que comenzar a 
@@ -204,21 +215,6 @@ continua:
 ;máximo de renglones, guardando la misma configuración que cuando los renglones
 ;son permitidos
 despan:	
-		
-		; mov al, 4h
-		; mov ch, 1
-		; mov cl, 1
-		; mov dl, 74
-		; mov dh, 74
-		; mov bh, 0000b
-		; mov ah, 06h
-		; int 10
-		; ;en el último renglón permitido
-		;  sub renglon, 02h
-		;  jmp cic	
-
-
-
 		mov ah, 6               ; http://www.ctyme.com/intr/rb-0096.htm
     	mov al, 2               ; number of lines to scroll
     	mov bh, 0               ; attribute
@@ -238,124 +234,8 @@ despan:
 ;!Agregar un parámetro a la función para que retorne un código según el comando interpretado
 ;! HECHAS: exit, dir, mkdir, touch, rm, rmdir
 ;!TODO cd
-verificador:
-
-		cld
-		mov si,offset comando
-		mov di,offset cexit
-		mov cx,lencomando
-		mov dx, cx
-		call des4
-		repe cmpsb 						;Se detendrá en dos posibles casos:
-		jne com_cd					; -encontró una diferencia
-		print "es exit"					; -CX llegó a 0.			
-		jmp salida
-
- com_cd:
-		cld 
-		mov si, offset comando
-		mov di, offset ccd
-		mov cx, lencomando
-		repe cmpsb
-		jne com_dir
-		print "Es cd"
-
-		mov ah, 3BH
-		lea dx, instrucciones
-		int 21h
-
-		jmp ret_ver
- com_dir:
-		cld 
-		mov si, offset comando
-		mov di, offset cdir
-		mov cx, lencomando
-		repe cmpsb
-		jne com_touch
-		print "Es dir"
-		jmp ret_ver
- com_touch:
-		cld 
-		mov si, offset comando
-		mov di, offset ctouch
-		mov cx, lencomando
-		repe cmpsb
-		jne com_mkdir
-		print "Es touch"
-
-		mov dx, offset instrucciones
-    	mov cx, 0
-    	mov ah, 3Ch
-    	int 21h
-    	mov outhandle, ax
-    	jc  erro
-
-    	mov ah, 3Eh
-    	mov bx, outhandle
-	    int 21h
-
-		jmp ret_ver
- com_mkdir:
-		cld 
-		mov si, offset comando
-		mov di, offset cmkdir
-		mov cx, lencomando
-		repe cmpsb
-		jne com_rm
-		print "Es mkdir"
-
-		mov ah, 39h
-		lea dx, instrucciones
-		int 21h
-
-		jmp ret_ver
- com_rm:
-		cld 
-		mov si, offset comando
-		mov di, offset crm
-		mov cx, lencomando
-		repe cmpsb
-		jne com_rmdir
-		print "Es rm "
-		
-		mov ah, 41h
-		lea dx,instrucciones
-		int 21h
-		
-		jmp ret_ver
-
- com_rmdir:
-		cld 
-		mov si, offset comando
-		mov di, offset crmdir
-		mov cx, lencomando
-		repe cmpsb
-		jne com_cls
-		print "Es rmdir "
-		
-		mov ah, 3Ah
-		lea dx,instrucciones
-		int 21h
-		jmp ret_ver
 
 
- com_cls:
-		cld 
-		mov si, offset comando
-		mov di, offset ccls
-		mov cx, lencomando
-		repe cmpsb
-		jne ret_ver
-
-		mov ax, 3
-		int 10h
-		mov renglon, -2
-		int 10h
-		
-		jmp ret_ver
-
- ret_ver:
- 		ret
 
 
 ejecucionComandos:
@@ -383,8 +263,8 @@ desar:
  cic1:  
  		lodsb
         mov dx, ax
-        call des2
-        call spc
+        ;call des2
+        ;call spc
         loop cic1
         ret
 
@@ -428,8 +308,6 @@ clean_arr:
 		stosb
 		loop cic_cdir	
 		ret
-
-
 
 
 salida: 	
