@@ -44,15 +44,9 @@ verificador:
 		repe cmpsb
 		jne com_dir
 
-; MOV    AL, VAR1              ; check value of VAR1 by moving it to AL.
-; LEA    BX, VAR1              ; get address of VAR1 in BX.
-; MOV    BYTE PTR [BX], 44h    ; modify the contents of VAR1.
-; MOV    AL, VAR1              ; check value of VAR1 by moving it to AL.
-;RET
 		mov bx, [bp+8]
 		mov word ptr [bx], 2h
 
-		print "Es cd"
 
 		jmp ret_ver
  com_dir:
@@ -99,7 +93,6 @@ verificador:
 		mov cx, [bp+6]
 		repe cmpsb
 		jne com_rmdir
-		print "Es rm "
 		
 		mov bx, [bp+8]
 		mov word ptr [bx], 6h
@@ -153,8 +146,6 @@ ejecutador:
 		cmp [bp+4], bx
 		jne flag_exit
 
-		print "es igual"
-
 		jmp ret_eje
  flag_exit:
 		mov bx, 1
@@ -162,8 +153,6 @@ ejecutador:
 		jne flag_cd
 		.exit 0
  flag_cd:
-		print "continua busqueda"
-
 		mov bx, 2
 		cmp [bp+4], bx
 		jne flag_dir

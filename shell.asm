@@ -3,8 +3,10 @@
 .MODEL SMALL
 .386
 include ..\fun\macros.asm
+include mshell.asm
 extrn verificador:near
 extrn ejecutador:near
+extrn desdir:near
 .STACK
 .DATA
 
@@ -33,83 +35,14 @@ instrucciones db 14 dup('-'), 0
 
 .CODE
 
+
+
 ;lenar es una macro que nos permite obtener la longitud de una cadena leída mediante la comparación 
 ;con un caracter del tipo ", este caracter es utilizado puesto que en la declaración de la cadena
 ;se hace uso de este caracter para la inicialización.
 
 ;Posiblemente en una futura versión se permita ingresar también el caracter que se busca para facilitar
 ;la reutilización de la macro
-lenar 	macro cad, len
-local cic1
-        pusha
-        mov bx, 0h
- cic1:  
- 		mov dl, cad[bx]
-        inc bx
-        cmp dl, '-'
-        jne cic1
-
-        dec bx
-		mov len, bx
-		mov lendir, bx
-
-        popa
-endm
-
-;sepcom es una macro que recibe dos cadenas y un registro de longitud de nombre len (este último se podría)
-; (omitir puesto que realmente no tiene tanta importancia ya que el resultado se guarda en una variable)
-;para separar el comando de los argumentos. cad es la cadena leída que incluye juntos el comando y sus 
-;argumentos, se busca el factor de separación que es 0D o 20, es decir '\n' o ' '. para luego copiar
-;el comando en una variable previamente definida y posteriormente copiará los argumentos
-sepcom 	macro cad, com, instr, len
-local 	cic1, sep_sal, copy
-        pusha
-        mov bx, 0h
-
- cic1:  
- 		mov dl, cad[bx]
-        inc bx
-        cmp dl, ' '
-		je sep_sal
-		cmp dl, 0DH
-		je sep_sal
-		jmp cic1
- sep_sal:	
-
- 		mov cx, bx
-		dec cx
-		mov lencomando, bx
-		mov bx, 0h
-		cld
-
-		cmp cx, 0
-		jg copy
-		
-		inc cx
-		
- copy:	
-		mov si, offset cad
-		mov di, offset com
-		rep movsb
-
-		mov dx, lencomando
-		mov cx, lendir
-		sub cx, dx	
-		cld
-		mov si, offset cad
-		add si, lencomando
-		mov di, offset instr
-		rep movsb
-		
-		mov bx, lendir
-		mov cx, lencomando
-		sub bx, cx
-		dec bx
-		mov instr[bx], 0h
-
-
-        popa
-endm
 
 main:   
 		mov ax, @data
@@ -145,9 +78,23 @@ cic:
     	int 21h ;Obtener ruta
     	jc erro;Saltar en caso de error
 
+;ndir [bp+4], renglon(valor) [bp+6], lendir [bp+8], BIEN [BP+8]
+
+		; mov dl, BIEN
+		; push dx
+		; mov dx, lendir
+		; push dx
+		; mov dl, renglon
+		; push dx
+		; mov dl, ndir
+		; push dx
+
+		; call desdir
+		; mov sp, 8
+
 		;Calcular el tamaño de la cadena en que se almacenó el dato de la ruta
 		mov cx, 0
-        lenar ndir cx
+        lenar ndir lendir
 		
 		;Desplegar ruta en la pantalla creada para emular lo que se muestra en dosbox al inicio
 		mov ah, 13h
@@ -177,11 +124,11 @@ cic:
 		call leecad
 
 		mov cx, 0
-		lenar cadena cx
+		lenar cadena lendir
 
 
 		mov cx, 0
-        sepcom cadena comando instrucciones cx 
+        sepcom cadena comando instrucciones  
 
 
 		mov bx, offset flagverifi			;[bp+8]
@@ -235,9 +182,6 @@ despan:
 ;! HECHAS: exit, dir, mkdir, touch, rm, rmdir
 ;!TODO cd
 
-
-
-
 ejecucionComandos:
 
 
@@ -256,17 +200,17 @@ leecad:
 
 ;Desar permite desplegar una cadena dada su dirección y tamaño. Nos la muestra en valores hexadecimales
 
-desar: 
- 		cld
-        mov si, offset instrucciones
-        mov cx, 14
- cic1:  
- 		lodsb
-        mov dx, ax
-        ;call des2
-        ;call spc
-        loop cic1
-        ret
+; desar: 
+;  		cld
+;         mov si, offset instrucciones
+;         mov cx, 14
+;  cic1:  
+;  		lodsb
+;         mov dx, ax
+;         ;call des2
+;         ;call spc
+;         loop cic1
+;         ret
 
 ;El principal funcionamiento de clean_array es limpiar el arreglo que lee los comandos y sus 
 ;argumentos para posteriormente dejarlo como si recien hubiera sido creado, de esta manera
