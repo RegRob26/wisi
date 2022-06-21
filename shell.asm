@@ -80,19 +80,21 @@ cic:
 
 ;ndir [bp+4], renglon(valor) [bp+6], lendir [bp+8], BIEN [BP+8]
 
-		; mov dl, BIEN
+		;mov dh, 0
+		; mov dx, offset BIEN
 		; push dx
 		; mov dx, lendir
 		; push dx
 		; mov dl, renglon
 		; push dx
-		; mov dl, ndir
+		; mov dx,offset ndir
 		; push dx
 
 		; call desdir
 		; mov sp, 8
 
 		;Calcular el tamaño de la cadena en que se almacenó el dato de la ruta
+		
 		mov cx, 0
         lenar ndir lendir
 		
@@ -123,11 +125,7 @@ cic:
 		mov dx, offset cadena		
 		call leecad
 
-		mov cx, 0
 		lenar cadena lendir
-
-
-		mov cx, 0
         sepcom cadena comando instrucciones  
 
 
@@ -157,7 +155,6 @@ continua:
 		jge despan
 		jmp cic
 
-
 ;Esta función desplaza la pantalla hacia arroba cuando se alcanza el tamaño
 ;máximo de renglones, guardando la misma configuración que cuando los renglones
 ;son permitidos
@@ -181,10 +178,6 @@ despan:
 ;!Agregar un parámetro a la función para que retorne un código según el comando interpretado
 ;! HECHAS: exit, dir, mkdir, touch, rm, rmdir
 ;!TODO cd
-
-ejecucionComandos:
-
-
 
 ;leecad es la función utilizada para leer la cadena dada por el usuario. Tiene un tamaño máximo restringido
 ;de 18 caracteres puesto que no se permiten cadenas demasiado largas por simplicidad del funcionamiento
@@ -252,7 +245,6 @@ clean_arr:
 		stosb
 		loop cic_cdir	
 		ret
-
 
 salida: 	
 		pop ax
