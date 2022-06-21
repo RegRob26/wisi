@@ -66,3 +66,18 @@ local 	cic1, sep_sal, copy
 
         popa
 endm
+
+
+
+clean_arr macro cadena, tam, reinicio
+local cic_cle
+		cld
+		mov di, offset cadena
+		mov cx, tam
+		mov ax, reinicio
+
+ cic_cle:
+		stosb
+		loop cic_cle
+
+endm

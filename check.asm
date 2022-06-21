@@ -169,6 +169,7 @@ ejecutador:
 		mov ah, 3BH
 		mov dx, [bp+6]
 		int 21h
+
 		jmp ret_eje
  flag_touch:
 
@@ -180,10 +181,11 @@ ejecutador:
     	mov ah, 3Ch
     	int 21h
     	mov outhandle, ax
-    	jc  ret_ver ;Aquí va salto a error
+    	jc  error_ex ;Aquí va salto a error
     	mov ah, 3Eh
     	mov bx, outhandle
 	    int 21h
+
 		jmp ret_eje
 
  flag_mkdir:
@@ -193,6 +195,7 @@ ejecutador:
 		mov ah, 39h
 		mov dx, [bp+6]
 		int 21h
+		jc error_ex
 
 		jmp ret_eje
  flag_rm:
@@ -202,6 +205,7 @@ ejecutador:
 		mov ah, 41h
 		mov dx,[bp+6]
 		int 21h
+		jc error_ex
 
 		jmp ret_eje
 
@@ -212,6 +216,7 @@ ejecutador:
 		mov ah, 3Ah
 		mov dx,[bp+6]
 		int 21h
+		jc error_ex
 
 		jmp ret_eje
 
@@ -225,8 +230,15 @@ ejecutador:
 		mov byte ptr [bx], -2
 		int 10h
 		
+		
 		jmp ret_eje
  ret_eje:
+		mov sp, bp
+		pop bp
+		ret
+
+ error_ex:
+		print "error de ejecución"
 		mov sp, bp
 		pop bp
 		ret
