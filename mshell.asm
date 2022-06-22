@@ -110,3 +110,20 @@ local cic_cle
 		loop cic_cle
 
 endm
+
+;Crear la macro des4 que permita imprimir un número mediante las coordenas 
+;recibidas y la interrupción 10 función 13h
+
+
+despnum macro datol, datoh, renglon, columna
+		
+		mov dl, columna
+		mov dh, renglon
+		mov bh, 0
+		mov ah, 02h
+		int 10h
+		
+		mov dl, datol
+		mov dh, datoh
+		call des4
+endm

@@ -33,6 +33,11 @@ fname 	db 13 dup(0)
 counter db ?
 lenfname dw ?
 
+divsizeH db 0
+divsizeL db 0
+renglon db 0
+columna db 0
+
 .STACK
 .CODE
 
@@ -204,11 +209,29 @@ ejecutador:
 		mov al, dl
 		mov ah, dh
 		mov dh, dl
+		inc dh
 		mov dl, ah
 		sub dl, 4
+		mov renglon, dh
 
 		mov si,bp
+		
 		cadprint 2 dh dl fname
+
+		mov dx, sizeh
+		mov divsizeH, dh
+		mov divsizeL, dl
+		mov columna, 14
+		despnum divsizeL, divsizeH, renglon, columna
+		;desplieganum divsizeL divsizeH renglon columna
+
+		mov dx, sizel
+		mov divsizeH, dh
+		mov divsizeL, dl
+		mov columna, 18
+		despnum divsizeL, divsizeH, renglon, columna
+		;desplieganum divsizeL divsizeH renglon columna
+
 		mov bp, offset fname
 		
 		;int 10h
@@ -231,12 +254,29 @@ ejecutador:
 
 		mov ah, dh
 		mov dh, dl
+		inc dh
 		mov dl, ah
 		sub dl, 4
+		mov renglon, dh
 
 		mov si,bp
 
 		cadprint lenfname dh dl fname
+		
+		mov dx, sizeh
+		mov divsizeH, dh
+		mov divsizeL, dl
+		mov columna, 14
+		despnum divsizeL, divsizeH, renglon, columna
+		;desplieganum divsizeL divsizeH renglon columna
+
+		mov dx, sizel
+		mov divsizeH, dh
+		mov divsizeL, dl
+		mov columna, 18
+		despnum divsizeL, divsizeH, renglon, columna
+		;desplieganum divsizeL divsizeH renglon columna
+
 
 		mov bp, si
 
