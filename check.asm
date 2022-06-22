@@ -3,8 +3,10 @@
 .MODEL SMALL
 .386
 include ..\fun\macros.asm
+include mshell.asm
 public verificador
 public ejecutador
+extrn des4:near
 .DATA
 
 outhandle dw ?
@@ -16,6 +18,20 @@ cmkdir 	db "mkdir-"
 crm		db "rm-"
 crmdir	db "rmdir-"
 ccls	db "cls-"
+
+
+patron 	db "*.*",0
+BIEN   	db ">"
+DTAI	db 21 dup(0)
+attr 	db 0
+time 	dw 0
+date 	dw 0
+sizel 	dw 0
+sizeh 	dw 0
+fname 	db 13 dup(0)
+
+counter db ?
+lenfname dw ?
 
 .STACK
 .CODE
@@ -141,6 +157,7 @@ ejecutador:
 
 		push bp
 		mov bp, sp
+		sub sp, 2
 
 		mov bx, 0
 		cmp [bp+4], bx
@@ -166,10 +183,82 @@ ejecutador:
 		cmp word ptr[bp+4], 3h
 		jne flag_touch
 		
-		mov ah, 3BH
-		mov dx, [bp+6]
+		mov ah, 1Ah
+		mov dx, offset DTAI
 		int 21h
 
+		call desdir
+
+  desdir:
+
+		mov dx, offset patron 
+		mov cx, 10h
+		mov ah, 4EH
+		int 21h
+		jc error_ex
+
+		mov bx, [bp+8]
+		mov dx, [bx]
+
+		add dl, 1
+		mov al, dl
+		mov ah, dh
+		mov dh, dl
+		mov dl, ah
+
+		mov ah, 13h
+		mov al, 1
+		mov bh, 00h
+		mov bl, 00000111b
+		mov cx, 2
+		;mov dl, bh
+		;mov dh, 2
+		
+		mov si,bp
+		mov bp, offset fname
+		int 10h
+		mov bp, si
+		
+		mov counter, 2		
+ nf:    
+ 		clean_arr fname 13 0
+ 		mov ah,4Fh
+        int 21h
+        jc exit_dir
+		mov dx, 1
+		lenar fname lenfname dx
+		
+		mov bx, [bp+8]
+		mov dx, [bx]
+
+		add dl, counter
+		mov al, dl
+		mov ah, dh
+		mov dh, dl
+		mov dl, ah
+
+		mov ah, 13h
+		mov al, 1
+		mov bh, 00h
+		mov bl, 00000111b
+		
+		mov cx, lenfname
+
+		; mov dh, [bp+8]
+		; mov dl, 0
+		mov si,bp
+		mov bp, offset fname
+		int 10h
+		mov bp, si
+
+		add counter, 1
+		
+		jmp nf
+
+ exit_dir:
+ 		mov bx, [bp+8]
+		mov dl, counter
+		add byte ptr [bx], dl
 		jmp ret_eje
  flag_touch:
 
@@ -226,11 +315,12 @@ ejecutador:
 
 		mov ax, 3
 		int 10h
+
 		mov bx, [bp+8]
 		mov byte ptr [bx], -2
 		int 10h
 		
-		
+
 		jmp ret_eje
  ret_eje:
 		mov sp, bp

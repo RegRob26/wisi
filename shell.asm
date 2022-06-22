@@ -83,7 +83,7 @@ cic:
 		;Calcular el tamaño de la cadena en que se almacenó el dato de la ruta
 		
 		mov cx, 0
-        lenar ndir lendir
+        lenar ndir lendir cx
 		
 		;Desplegar ruta en la pantalla creada para emular lo que se muestra en dosbox al inicio
 		mov ah, 13h
@@ -112,7 +112,8 @@ cic:
 		mov dx, offset cadena		
 		call leecad
 
-		lenar cadena lendir
+		mov cx, 0
+		lenar cadena lendir cx
         sepcom cadena comando instrucciones  
 
 

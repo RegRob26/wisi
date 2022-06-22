@@ -1,7 +1,11 @@
-lenar macro cad, lendir
-local cic1
+lenar macro cad, lendir, modo
+local cic1, cic2, sal_lenar
         pusha
+	
         mov bx, 0h
+		cmp modo, 0
+		je cic1
+		jmp cic2
  cic1:  
  		mov dl, cad[bx]
         inc bx
@@ -9,6 +13,18 @@ local cic1
         jne cic1
         dec bx
 		mov lendir, bx
+		jmp sal_lenar
+
+ cic2:  
+ 		mov dl, cad[bx]
+        inc bx
+        cmp dl, 0
+        jne cic2
+        dec bx
+		mov lendir, bx
+
+ sal_lenar:
+
         popa
 endm
 
