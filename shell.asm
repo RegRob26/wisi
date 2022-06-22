@@ -19,7 +19,7 @@ sizeh 	dw 0
 fname 	db 13 dup(0)
 
 
-BIEN 		db ">"
+BIEN 		db "> \"
 ndir 		db 164 dup('-')
 lendir 		dw ?
 renglon 	db ?
@@ -90,7 +90,7 @@ cic:
 		mov al, 1
 		mov bh, 00h
 		mov bl, 00000111b
-		mov cx, 1
+		mov cx, 3
 		mov dh, renglon
 		mov dl, 0
 		mov bp, offset BIEN
@@ -102,7 +102,7 @@ cic:
 		mov bl, 00000111b
 		mov cx, lendir
 		mov dh, renglon
-		mov dl, 2
+		mov dl, 3
 		mov bp, offset ndir
 		int 10h
 

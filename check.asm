@@ -205,6 +205,7 @@ ejecutador:
 		mov ah, dh
 		mov dh, dl
 		mov dl, ah
+		sub dl, 2
 
 		mov ah, 13h
 		mov al, 1
@@ -233,9 +234,11 @@ ejecutador:
 
 		add dl, counter
 		mov al, dl
+
 		mov ah, dh
 		mov dh, dl
 		mov dl, ah
+		sub dl, 2
 
 		mov ah, 13h
 		mov al, 1
