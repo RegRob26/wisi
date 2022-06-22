@@ -205,19 +205,13 @@ ejecutador:
 		mov ah, dh
 		mov dh, dl
 		mov dl, ah
-		sub dl, 2
+		sub dl, 4
 
-		mov ah, 13h
-		mov al, 1
-		mov bh, 00h
-		mov bl, 00000111b
-		mov cx, 2
-		;mov dl, bh
-		;mov dh, 2
-		
 		mov si,bp
+		cadprint 2 dh dl fname
 		mov bp, offset fname
-		int 10h
+		
+		;int 10h
 		mov bp, si
 		
 		mov counter, 2		
@@ -238,20 +232,12 @@ ejecutador:
 		mov ah, dh
 		mov dh, dl
 		mov dl, ah
-		sub dl, 2
+		sub dl, 4
 
-		mov ah, 13h
-		mov al, 1
-		mov bh, 00h
-		mov bl, 00000111b
-		
-		mov cx, lenfname
-
-		; mov dh, [bp+8]
-		; mov dl, 0
 		mov si,bp
-		mov bp, offset fname
-		int 10h
+
+		cadprint lenfname dh dl fname
+
 		mov bp, si
 
 		add counter, 1

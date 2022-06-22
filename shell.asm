@@ -7,9 +7,24 @@ include mshell.asm
 extrn verificador:near
 extrn ejecutador:near
 extrn desdir:near
+
 .STACK
 .DATA
+mov dx,offset DTA
+mov ah,1Ah
+int 21h
 
+mov dx, offset comex
+xor cx, cx
+mov ah,4Eh
+int 21h
+jc  exit
+
+mov ah,40h 
+mov bx, dst_fh 
+mov cx,13
+lea dx, DTA+30d 
+int 21h 
 DTA 	db 21 dup(0)
 attr 	db 0
 time 	dw 0
@@ -84,27 +99,12 @@ cic:
 		
 		mov cx, 0
         lenar ndir lendir cx
-		
-		;Desplegar ruta en la pantalla creada para emular lo que se muestra en dosbox al inicio
-		mov ah, 13h
-		mov al, 1
-		mov bh, 00h
-		mov bl, 00000111b
-		mov cx, 3
-		mov dh, renglon
-		mov dl, 0
-		mov bp, offset BIEN
-		int 10h
 
-		mov ah, 13h
-		mov al, 1
-		mov bh, 00h
-		mov bl, 00000111b
-		mov cx, lendir
-		mov dh, renglon
-		mov dl, 3
-		mov bp, offset ndir
-		int 10h
+		mov di, 3
+		mov dl, 0
+
+		cadprint di renglon dl BIEN
+		cadprint lendir renglon 3 ndir
 
 		;Preparamos la lectura de la terminal y la guardamos dentro del arreglo con  nombre cadena
 		;Tiene 
@@ -157,7 +157,7 @@ despan:
     	mov bh, 0               ; attribute
     	mov ch, 0               ; row top
     	mov cl, 0               ; col left
-    	mov dh, 0             ; row bottom
+    	mov dh, 0             	; row bottom
     	mov dl, 80              ; ckittyol right
     	int 10h
 
@@ -183,62 +183,6 @@ leecad:
         int 21h
         mov al, [bx-1]
         ret	
-
-;Desar permite desplegar una cadena dada su dirección y tamaño. Nos la muestra en valores hexadecimales
-
-; desar: 
-;  		cld
-;         mov si, offset instrucciones
-;         mov cx, 14
-;  cic1:  
-;  		lodsb
-;         mov dx, ax
-;         ;call des2
-;         ;call spc
-;         loop cic1
-;         ret
-
-;El principal funcionamiento de clean_array es limpiar el arreglo que lee los comandos y sus 
-;argumentos para posteriormente dejarlo como si recien hubiera sido creado, de esta manera
-;evitamos que hay sobreposición de datos
-
-
-; clean_ar:
-
-; 		cld
-; 		mov di, offset comando
-; 		mov cx, 6
-; 		mov ax, '-'
-
-;  cic_cle:
-; 		stosb
-; 		loop cic_cle
-
-; 		cld 
-; 		mov di, offset cadena
-; 		mov cx, 18
-; 		mov ax, '-'
-
-;  cic_cals:
-; 		stosb
-; 		loop cic_cals
-; 		cld 
-; 		mov di, offset instrucciones
-; 		mov cx, 12
-; 		mov ax, '-'
-;  cic_ins:
-;  		stosb
-; 		loop cic_ins
-;  cic_ndir:
-; 		cld
-; 		mov di, offset ndir
-; 		mov cx, 164
-; 		mov ax, '-'
-
-;  cic_cdir:
-; 		stosb
-; 		loop cic_cdir	
-; 		ret
 
 salida: 	
 		pop ax

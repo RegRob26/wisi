@@ -84,6 +84,19 @@ local 	cic1, sep_sal, copy
 endm
 
 
+cadprint macro lendir, renglon, columna, cad
+
+		mov ah, 13h
+		mov al, 1
+		mov bh, 00h
+		mov bl, 00000111b
+		mov cx, lendir
+		mov dh, renglon
+		mov dl, columna
+		mov bp, offset cad
+		int 10h
+
+endm
 
 clean_arr macro cadena, tam, reinicio
 local cic_cle
