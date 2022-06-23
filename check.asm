@@ -191,7 +191,6 @@ ejecutador:
 		mov ah, 1Ah
 		mov dx, offset DTAI
 		int 21h
-
 		call desdir
 
   desdir:
@@ -211,7 +210,7 @@ ejecutador:
 		mov dh, dl
 		inc dh
 		mov dl, ah
-		sub dl, 4
+		sub dl, 3
 		mov renglon, dh
 
 		mov si,bp
@@ -222,14 +221,14 @@ ejecutador:
 		mov divsizeH, dh
 		mov divsizeL, dl
 		mov columna, 14
-		despnum divsizeL, divsizeH, renglon, columna
+		;despnum divsizeL, divsizeH, renglon, columna
 		;desplieganum divsizeL divsizeH renglon columna
 
 		mov dx, sizel
 		mov divsizeH, dh
 		mov divsizeL, dl
 		mov columna, 18
-		despnum divsizeL, divsizeH, renglon, columna
+		;despnum divsizeL, divsizeH, renglon, columna
 		;desplieganum divsizeL divsizeH renglon columna
 
 		mov bp, offset fname
@@ -256,32 +255,38 @@ ejecutador:
 		mov dh, dl
 		inc dh
 		mov dl, ah
-		sub dl, 4
+		sub dl, 3
 		mov renglon, dh
 
 		mov si,bp
 
 		cadprint lenfname dh dl fname
 		
-		mov dx, sizeh
+
+		;Para evitar imprimir el tamaño de los directorios . y ..
+		cmp counter, 2
+		jg ot_dir
+		jmp con_dir
+
+
+ ot_dir:
+ 		mov dx, sizeh
 		mov divsizeH, dh
 		mov divsizeL, dl
-		mov columna, 14
+		mov columna, 15
 		despnum divsizeL, divsizeH, renglon, columna
 		;desplieganum divsizeL divsizeH renglon columna
 
 		mov dx, sizel
 		mov divsizeH, dh
 		mov divsizeL, dl
-		mov columna, 18
+		mov columna, 19
 		despnum divsizeL, divsizeH, renglon, columna
 		;desplieganum divsizeL divsizeH renglon columna
 
-
+con_dir:
 		mov bp, si
-
 		add counter, 1
-		
 		jmp nf
 
  exit_dir:
