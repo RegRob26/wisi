@@ -1,0 +1,59 @@
+%
+
+%
+
+%
+exit
+
+%
+
+
+%cd
+
+%
+
+%touch
+
+%
+
+%dir
+
+
+
+%
+
+%
+mkdir
+
+Uso:    mkdir "nombre directorio"
+
+        Donde el nombre del directorio es de un tamanio maximo
+        permitido de 8 caracteres.
+
+
+%
+
+%
+rm
+
+Permite eliminar elementos del tipo archivos mediante la siguiente
+sintaxis
+
+uso:    rm "nombre_archivo.ext"         (si el archivo esta en el directorio actual)
+        rm "ruta/nombre_archivo.ext"    (Con el PATH del archivo)
+
+
+%
+
+%rmdir
+
+Uso:    rmdir "nombre directorio"       (si el directorio esta en el directorio actual)
+        rmdir "PATH/nombre_directorio"  (si el directorio esta en otra ruta)
+
+
+%
+
+%cls
+
+%
+~
