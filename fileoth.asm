@@ -10,8 +10,14 @@ public comparaciones
 .STACK
 
 .data
+dirupa db "\", 0
+setdir db "FILESASM\TASMFS\ARCHIVOS\PROYECTO", 0
+ndirtemp db 64 dup('$'), 0
+setloc db 64 dup('$')
 narchivo db "helpfile.txt",0h
 fid dw ?
+
+lendirint 		dw ?
 
 lendata dw 0
 resultado db 1 dup (0)
@@ -21,17 +27,22 @@ temporal db ?
 bufer db ?
 bufer2 db ?
 
-dirupa db "\", 0
-setdir db "FILESASM\TASMFS\ARCHIVOS\PROYECTO", 0
-ndirtemp db ?
+
 .code
 comparaciones:
+        mov ax, @data
+        mov ds, ax
+        mov es, ax
+
         mov elegido, dx
+
+        
 
         mov dl,0 ;unidad actual
     	mov si,offset ndirtemp ;ds:si buffer
     	mov ah,47h ;Código para obtener ruta
     	int 21h ;Obtener ruta
+        call reto
 
         mov dx, offset dirupa
         mov ah, 3bh
@@ -92,25 +103,55 @@ comparaciones:
         sub di, 1
         mov temporal[di], '$'
  
-        call reto
         mov dx, offset temporal
         mov ah, 09h
         int 21h
+       
+
         jmp sal_file
 
  continua:
         inc si
         jmp cic_comp
  sal_file:
+        
        ;clean_arr bufer 0fffh '?'  
-        mov dx, offset ndirtemp
-        mov ah, 3bh
-        int 21h
 
+        
+        
         mov dx, offset narchivo
         mov ah, 3Dh
         mov al, 0
         int 21h
+
+
+        mov si, 0
+        mov setloc[si], "\"
+        
+        
+ cic_chn:
+        mov dl, ndirtemp[si]
+        cmp dl, '$'
+        je chn_dir
+        inc si
+        mov setloc[si], dl
+        
+        jmp cic_chn
+ chn_dir:
+        inc si
+        mov setloc[si], 0h
+   
+        mov dx, offset setloc
+        mov ah, 3bh
+        int 21h
+        ; mov dx, offset ndirtemp
+        ; mov ah, 09h
+        ; int 21h
+    
+        ; mov dx, offset dirupa
+        ; mov ah, 3bh
+        ; int 21h
+
         
        ret
  error_primero:
