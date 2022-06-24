@@ -8,6 +8,8 @@ Uso:    exit
         Permite salir del programa principal excluyendo cualquier tipo
         de operación que se este realizando, es decir, interrumpe el  
         programa de manera inmediata.
+        Uso:
+                exit               salir del programa principal
 %
 
 %cd
@@ -15,42 +17,74 @@ Uso:    cd "X"
         
         Permite cambiar entre directorios existentes por medio de la
         sintaxis referida en la primera línea, el cambio se hace con
-        la explicación siguiente.
-        
+        la explicacion siguiente.
+
         X puede ser desde una ruta del tipo Directorio/directorio,
         o lo siguiente:
-                ..      directorio anterior
-                ...     Directorio anterior del directorio anterior  
+        Uso:
+                cd ..              Directorio anterior(cada punto extra
+                                   es un directorio mas)
+                cd <directorio>    Directorio siguiente
         
 %
 
 %
 dir
+        Permite mostrar los directorios y/o ficheros que se encuentran
+        en el directorio actual.
+
+        Uso:
+                dir              muestra archivos del directorio
+                                 actual
+
 %
 
 %touch
+        Crea archivos en el directorio actual o en un subdirectorio.
+
+        Uso:
+          touch <nombre>.<extension>    crea archivo en directorio
+                                        actual
+
+                                        crea archivo en subdirectorio
+          touch <subdirectorio>\<nombre>.<extension>
 %
 
 %
 mkdir
-Uso:    mkdir "nombre directorio"
+        Crea directorios y subdirectorios. El nombre del directorio
+        no debe de exeder los 8 caracteres.
 
-        Donde el nombre del directorio es de un tamanio maximo
-        permitido de 8 caracteres.
+        Uso:
+                                Crear archivos en directorio
+        mkdir <nombre directorio>
+                                Crear archivos en subdirectorio
+        mkdir <subdirectorio>\<nombre directorio>
+
 %
 
 %rm
-Permite eliminar elementos del tipo archivos mediante la siguiente
-sintaxis
+        Permite eliminar elementos del tipo archivos mediante la siguiente
+        sintaxis
 
-uso:    rm "nombre_archivo.ext"         (si el archivo esta en el directorio actual)
-        rm "ruta/nombre_archivo.ext"    (Con el PATH del archivo)
+        uso:
+        rm <nombre_archivo.ext>           si el archivo esta en el
+                                           directorio actual
+        rm <ruta>/<nombre_archivo.ext>    Con el PATH del archivo
 %
 
 %rmdir
-Uso:    rmdir "nombre directorio"       (si el directorio esta en el directorio actual)
-        rmdir "PATH/nombre_directorio"  (si el directorio esta en otra ruta)
+        Uso:
+
+        rmdir <nombre directorio>         si el directorio esta en el
+                                           directorio actual
+        rmdir <PATH>/<nombre_directorio>  si el directorio esta en otra
+                                           ruta
 %
 
 %cls
+        Permite limpiar la pantalla para comodidad del usuario
+        uso:
+
+        cls                             limpia pantalla
 %
