@@ -2,58 +2,55 @@
 
 %
 
-%
-exit
+%exit
 
+Uso:    exit
+        Permite salir del programa principal excluyendo cualquier tipo
+        de operación que se este realizando, es decir, interrumpe el  
+        programa de manera inmediata.
 %
-
 
 %cd
+Uso:    cd "X"
+        
+        Permite cambiar entre directorios existentes por medio de la
+        sintaxis referida en la primera línea, el cambio se hace con
+        la explicación siguiente.
+        
+        X puede ser desde una ruta del tipo Directorio/directorio,
+        o lo siguiente:
+                ..      directorio anterior
+                ...     Directorio anterior del directorio anterior  
+        
+%
 
+%
+dir
 %
 
 %touch
-
-%
-
-%dir
-
-
-
 %
 
 %
 mkdir
-
 Uso:    mkdir "nombre directorio"
 
         Donde el nombre del directorio es de un tamanio maximo
         permitido de 8 caracteres.
-
-
 %
 
-%
-rm
-
+%rm
 Permite eliminar elementos del tipo archivos mediante la siguiente
 sintaxis
 
 uso:    rm "nombre_archivo.ext"         (si el archivo esta en el directorio actual)
         rm "ruta/nombre_archivo.ext"    (Con el PATH del archivo)
-
-
 %
 
 %rmdir
-
 Uso:    rmdir "nombre directorio"       (si el directorio esta en el directorio actual)
         rmdir "PATH/nombre_directorio"  (si el directorio esta en otra ruta)
-
-
 %
 
 %cls
-
 %
-~

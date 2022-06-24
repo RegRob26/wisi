@@ -8,23 +8,9 @@ extrn verificador:near
 extrn ejecutador:near
 extrn desdir:near
 
+
 .STACK
 .DATA
-mov dx,offset DTA
-mov ah,1Ah
-int 21h
-
-mov dx, offset comex
-xor cx, cx
-mov ah,4Eh
-int 21h
-jc  exit
-
-mov ah,40h 
-mov bx, dst_fh 
-mov cx,13
-lea dx, DTA+30d 
-int 21h 
 DTA 	db 21 dup(0)
 attr 	db 0
 time 	dw 0
@@ -68,7 +54,7 @@ main:
         mov dx,offset DTA
         int 21h
         mov bx, 0
-
+		
  		;leer configuración de pantalla y guardarla en la pila
 		mov ah,0fh
 		int 10h
@@ -85,7 +71,7 @@ main:
 		;47 Obtiene el directorio actual Disco DL = numero de la unidad del disco; DS:SI = puntador
 		; al área del usuario de 64 bytes, la que contiene el
 		; directorio; AX contiene el código de error
-
+		;call lectu
 cic:	
 		mov dl,0 ;unidad actual
     	mov si,offset ndir ;ds:si buffer
@@ -116,7 +102,8 @@ cic:
 		lenar cadena lendir cx
         sepcom cadena comando instrucciones  
 
-
+		mov bx, offset instrucciones
+		push bx
 		mov bx, offset flagverifi			;[bp+8]
 		push bx
 		mov dx, lencomando			;[bp + 6]
@@ -152,8 +139,11 @@ continua:
 ;máximo de renglones, guardando la misma configuración que cuando los renglones
 ;son permitidos
 despan:	
+		; mov dl, renglon
+		; sub dl, 24
+
 		mov ah, 6               ; http://www.ctyme.com/intr/rb-0096.htm
-    	mov al, 2               ; number of lines to scroll
+    	mov al, 2              ; number of lines to scroll
     	mov bh, 0               ; attribute
     	mov ch, 0               ; row top
     	mov cl, 0               ; col left
@@ -162,6 +152,8 @@ despan:
     	int 10h
 
 		sub renglon, 02h
+		cmp renglon, 25
+		jge despan
 		jmp cic
 ;verificador se va a encargar de la interpretación del comando y la correcta elección del comando ingresado
 ;puesto que los comando están previamente definidos se opta por directamente referenciarlos en la función
