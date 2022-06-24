@@ -1,7 +1,6 @@
 %
 
 %
-
 %exit
 
 Uso:    exit
@@ -87,4 +86,21 @@ mkdir
         uso:
 
         cls                             limpia pantalla
+%
+
+%help
+        Si desea saber mas sobre algun comando puede utilizar:
+
+                <comando>  &&help
+
+        comandos:
+                cls                     Limpiar pantalla
+                dir                     Mostrar archivos.
+                exit                    Salir del programa
+                cd      <directorio>    Navegar entre directorios.
+                mkdir   <directorio>    Crear nuevo directorio
+                rmdir   <directorio>    Borrar directorio
+                touch   <fichero>       Crear nuevo fichero
+                rm      <fichero>       Crear nuevo fichero
+
 %
