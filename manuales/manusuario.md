@@ -12,7 +12,7 @@
 <center> <b> ◈  wisi (Interprete de comandos)  ◈
 
 * * *
-<center> **[Repositorio del proyecto.](https://github.com/RegRob26/pareshell.git)**
+<center> **[Repositorio del proyecto.](https://github.com/RegRob26/wisi.git)**
 * * *
 
 ## <center> Tabla de Contenido 
@@ -31,7 +31,7 @@
         2.1. Comando dir
             2.1.1. Descripción del comando.
             2.1.2. Parametros  del comando.
-            2.1.3. Ejemplos    del comando.
+            2.1.3. Ejemplos    depareshelll comando.
         2.2. Comando cd
             2.2.1. Descripción del comando.
             2.2.2. Parametros  del comando.
@@ -55,7 +55,7 @@
         2.7. Comando cls
             2.7.1. Descripción del comando.
             2.7.2. Parametros  del comando.
-            2.7.3. Ejemplos    del comando.
+            2.pareshell7.3. Ejemplos    del comando.
         2.8. Comando exit
             2.8.1. Descripción del comando.
             2.8.2. Parametros  del comando.
@@ -102,7 +102,7 @@ wisi. </div>
                                                             1. tasm shell
                                                             2. tasm check
                                                             3. tasm fileoth
-                                                            4. tasm fun
+                                   pareshell                         4. tasm fun
                                                             5. tlink shell check fileoth fun
                                                             6. SHELL.EXE
 
@@ -161,7 +161,7 @@ wisi. </div>
      <code> cd ..
 
 + *Acceder a dos carpetas carpetas atras (por cada punto extra equivale a una carpeta hacia atras):*
-
+pareshell
      <code> cd ...
 
 #### 2.2.3. Ejemplos del comando.
