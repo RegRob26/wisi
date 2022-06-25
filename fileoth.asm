@@ -11,13 +11,13 @@ public comparaciones
 
 .data
 dirupa db "\", 0
-setdir db "FILESASM\TASMFS\ARCHIVOS\PROYECTO", 0
+setdir db "\SHELL\", 0
 ndirtemp db 64 dup('$'), 0
 setloc db 64 dup('$')
 narchivo db "helpfile.txt",0h
 fid dw ?
 
-lendirint 		dw ?
+lendirint dw ?
 
 lendata dw 0
 resultado db 1 dup (0)
@@ -36,7 +36,6 @@ comparaciones:
 
         mov elegido, dx
 
-        
 
         mov dl,0 ;unidad actual
     	mov si,offset ndirtemp ;ds:si buffer
@@ -144,14 +143,6 @@ comparaciones:
         mov dx, offset setloc
         mov ah, 3bh
         int 21h
-        ; mov dx, offset ndirtemp
-        ; mov ah, 09h
-        ; int 21h
-    
-        ; mov dx, offset dirupa
-        ; mov ah, 3bh
-        ; int 21h
-
         
        ret
  error_primero:

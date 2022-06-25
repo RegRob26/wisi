@@ -2,7 +2,7 @@
 ;Declaración de los comandos existentes
 .MODEL SMALL
 .386
-include ..\fun\macros.asm
+include macros.asm
 include mshell.asm
 public verificador
 public ejecutador
@@ -20,8 +20,8 @@ crm		db "rm-"
 crmdir	db "rmdir-"
 ccls	db "cls-"
 
-help 	db "&&help"
-
+help 	db "&&help-"
+helpt 	db "&help-"
 patron 	db "*.*",0
 BIEN   	db ">"
 DTAI	db 21 dup(0)
@@ -78,9 +78,6 @@ verificador:
 		mov cx, 6
 		repe cmpsb
 		jne ret_ver
-
-		;print "es el help de cd"
-		;.exit 0
 		mov bx, [bp+8]
 		mov word ptr [bx], 21h
 
@@ -92,7 +89,7 @@ verificador:
 		mov cx, [bp+6]
 		repe cmpsb
 		jne com_touch
-		;print "Es dir"
+
 		mov bx, [bp+8]
 		mov word ptr [bx], 3h
 
@@ -104,8 +101,6 @@ verificador:
 		repe cmpsb
 		jne ret_ver
 
-		;print "es el help de cd"
-		;.exit 0
 		mov bx, [bp+8]
 		mov word ptr [bx], 31h
 
@@ -117,7 +112,7 @@ verificador:
 		mov cx, [bp+6]
 		repe cmpsb
 		jne com_mkdir
-		;print "Es touch"
+
 		
 		mov bx, [bp+8]
 		mov word ptr [bx], 4h
@@ -130,8 +125,6 @@ verificador:
 		repe cmpsb
 		jne ret_ver
 
-		;print "es el help de cd"
-		;.exit 0
 		mov bx, [bp+8]
 		mov word ptr [bx], 41h
 
@@ -143,7 +136,7 @@ verificador:
 		mov cx, [bp+6]
 		repe cmpsb
 		jne com_rm
-		;print "Es mkdir"
+		
 		mov bx, [bp+8]
 		mov word ptr [bx], 5h
   help_mkdir:		
@@ -154,8 +147,7 @@ verificador:
 		repe cmpsb
 		jne ret_ver
 
-		;print "es el help de cd"
-		;.exit 0
+
 		mov bx, [bp+8]
 		mov word ptr [bx], 51h
 
@@ -178,8 +170,7 @@ verificador:
 		repe cmpsb
 		jne ret_ver
 
-		;print "es el help de cd"
-		;.exit 0
+
 		mov bx, [bp+8]
 		mov word ptr [bx], 61h
 
@@ -193,8 +184,7 @@ verificador:
 		mov cx, [bp+6]
 		repe cmpsb
 		jne com_cls
-		;print "Es rmdir "
-		
+
 		mov bx, [bp+8]
 		mov word ptr [bx], 7h
 
@@ -206,8 +196,7 @@ verificador:
 		repe cmpsb
 		jne ret_ver
 
-		;print "es el help de cd"
-		;.exit 0
+
 		mov bx, [bp+8]
 		mov word ptr [bx], 71h
 
@@ -220,7 +209,7 @@ verificador:
 		mov di, offset ccls
 		mov cx, [bp+6]
 		repe cmpsb
-		jne ret_ver
+		jne com_help
 
 		mov bx, [bp+8]
 		mov word ptr [bx], 8h
@@ -233,12 +222,23 @@ verificador:
 		repe cmpsb
 		jne ret_ver
 
-		;print "es el help de cd"
-		;.exit 0
+
 		mov bx, [bp+8]
 		mov word ptr [bx], 81h
 
 		jmp ret_ver
+
+ com_help:
+		cld 
+		
+		mov si, [bp+4]
+		mov di, offset helpt
+		mov cx, 5
+		repe cmpsb
+		jne ret_ver
+		
+		mov bx, [bp+8]
+		mov word ptr [bx], 9h
 
  ret_ver:
 		mov sp, bp
@@ -321,15 +321,11 @@ ejecutador:
 		mov divsizeH, dh
 		mov divsizeL, dl
 		mov columna, 14
-		;despnum divsizeL, divsizeH, renglon, columna
-		;desplieganum divsizeL divsizeH renglon columna
 
 		mov dx, sizel
 		mov divsizeH, dh
 		mov divsizeL, dl
 		mov columna, 18
-		;despnum divsizeL, divsizeH, renglon, columna
-		;desplieganum divsizeL divsizeH renglon columna
 
 		mov bp, offset fname
 		
@@ -375,15 +371,13 @@ ejecutador:
 		mov divsizeL, dl
 		mov columna, 15
 		despnum divsizeL, divsizeH, renglon, columna
-		;desplieganum divsizeL divsizeH renglon columna
-
+		
 		mov dx, sizel
 		mov divsizeH, dh
 		mov divsizeL, dl
 		mov columna, 19
 		despnum divsizeL, divsizeH, renglon, columna
-		;desplieganum divsizeL divsizeH renglon columna
-
+		
  con_dir:
 		mov bp, si
 		add counter, 1
@@ -524,7 +518,7 @@ ejecutador:
  flag_helpcls:
 		mov bx, 81h
 		cmp [bp+4], bx
-		jne ret_eje
+		jne flag_helphelp
 
 		mov dx, 16  
 		call comparaciones
@@ -533,6 +527,21 @@ ejecutador:
 		mov dl, counter
 		add byte ptr [bx], 20
 		jmp ret_eje
+
+ flag_helphelp:
+
+		mov bx, 9h
+		cmp [bp+4], bx
+		jne ret_eje
+
+		mov dx, 18  
+		call comparaciones
+
+		mov bx, [bp+8]
+		mov dl, counter
+		add byte ptr [bx], 20
+		jmp ret_eje
+
  ret_eje:
 		mov sp, bp
 		pop bp

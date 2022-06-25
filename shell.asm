@@ -2,7 +2,7 @@
 
 .MODEL SMALL
 .386
-include ..\fun\macros.asm
+include macros.asm
 include mshell.asm
 extrn verificador:near
 extrn ejecutador:near
@@ -29,21 +29,12 @@ flagverifi	dw ?
 
 
 pre_cad 	db 2 dup(?)
-cadena 		db 19 dup('-')
+cadena 		db 30 dup('-')
 comando 	db 6 dup('-')
-instrucciones db 14 dup('-'), 0
+instrucciones db 25 dup('-'), 0
 
 
 .CODE
-
-
-
-;lenar es una macro que nos permite obtener la longitud de una cadena leída mediante la comparación 
-;con un caracter del tipo ", este caracter es utilizado puesto que en la declaración de la cadena
-;se hace uso de este caracter para la inicialización.
-
-;Posiblemente en una futura versión se permita ingresar también el caracter que se busca para facilitar
-;la reutilización de la macro
 
 main:   
 		mov ax, @data
@@ -94,7 +85,7 @@ cic:
 
 		;Preparamos la lectura de la terminal y la guardamos dentro del arreglo con  nombre cadena
 		;Tiene 
-		mov cl, 19
+		mov cl, 30
 		mov dx, offset cadena		
 		call leecad
 
@@ -125,8 +116,8 @@ cic:
 continua:
 
 		clean_arr comando 6 '-'
-		clean_arr cadena 18 '-'
-		clean_arr instrucciones 12 '-'
+		clean_arr cadena 30 '-'
+		clean_arr instrucciones 25 '-'
 		clean_arr ndir 164 '-'
 		
 		add renglon, 02h		;25 renglones como máximo, después de eso se tiene que comenzar a 
@@ -142,13 +133,13 @@ despan:
 		; mov dl, renglon
 		; sub dl, 24
 
-		mov ah, 6               ; http://www.ctyme.com/intr/rb-0096.htm
-    	mov al, 2              ; number of lines to scroll
+		mov ah, 6               
+    	mov al, 2              ; Líneas a hacer scroll
     	mov bh, 0               ; attribute
-    	mov ch, 0               ; row top
-    	mov cl, 0               ; col left
-    	mov dh, 0             	; row bottom
-    	mov dl, 80              ; ckittyol right
+    	mov ch, 0               ; renglon superior
+    	mov cl, 0               ; columna izquierda
+    	mov dh, 0             	; renglon inferior
+    	mov dl, 80              ; columna derecha
     	int 10h
 
 		sub renglon, 02h
