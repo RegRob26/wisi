@@ -11,7 +11,7 @@
 <center> <b> ◈  wisi (Interprete de comandos)  ◈
 
 * * *
-<center> **[Repositorio del proyecto.](https://github.com/RegRob26/pareshell.git)**
+<center> **[Repositorio del proyecto.](https://github.com/RegRob26/wisi.git)**
 
 * * *
 
